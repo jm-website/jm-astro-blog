@@ -26,13 +26,12 @@ jobs:
         with:
           node-version: 24
 
-      # 💡 락 파일 무시 및 에러 추적을 패스하여 의존성 충돌을 원천 차단합니다.
       - name: Install Dependencies
         run: npm install --legacy-peer-deps --no-audit --no-fund
 
-      # 💡 환경 차이로 인한 모든 빌드 오류를 씹고 정적 페이지를 강제로 뽑아내는 마법의 명령어입니다.
+      # 💡 빌드 경로를 명시적으로 고정하여 깃허브 로봇이 길을 잃지 않게 만듭니다.
       - name: Build Astro
-        run: npx astro build --unsafe-disable-pure-css || true
+        run: npx astro build --outDir dist
 
       - name: Upload Artifacts
         uses: actions/upload-pages-artifact@v3
