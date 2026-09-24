@@ -26,10 +26,11 @@ jobs:
         with:
           node-version: 24
 
+      # 💡 락 파일 충돌을 막기 위해 가볍게 필수 부품만 강제 설치하도록 우회합니다.
       - name: Install Dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
 
-      # 💡 윈도우 환경과 리눅스 환경의 아스트로 빌드 스크립트 충돌을 방지하는 마법의 우회 명령어입니다.
+      # 💡 시스템 간의 빌드 명령어 마찰을 방지하는 다이렉트 빌드 방식입니다.
       - name: Build Astro
         run: npx astro build
 
