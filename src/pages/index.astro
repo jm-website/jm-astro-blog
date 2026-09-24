@@ -1,11 +1,15 @@
 ---
-// 아스트로 영역: 서버에서 미리 안전하게 처리할 데이터를 여기에 배치합니다.
-// 이제 브라우저가 위험한 스크립트를 검사하느라 30초 동안 멈추는 현상이 완벽히 차단됩니다.
-const priceTitle = "🔮 상담안내";
-const priceDesc = "마음의 여유를 찾는 1:1 맞춤형 라벤더 케어 상담 신청 공간입니다. 편안한 분위기 속에서 이야기를 나누어보세요.";
+// 💡 아스트로 진짜 글 수집 엔진 가동! 
+import { getCollection } from 'astro:content';
+const allPosts = await getCollection('blog');
 
-const videoTitle = "🎬 영상 공간";
-const videoDesc = "일상의 피로를 덜어내고 심신을 안정시켜주는 힐링 영상과 가이드 클립을 시청하실 수 있습니다.";
+// 💡 내가 지정한 순서(sortOrder) 번호대로 정렬, 번호가 없으면 날짜순 정렬
+const sortedPosts = allPosts.sort((a, b) => {
+  const orderA = a.data.sortOrder ?? 999;
+  const orderB = b.data.sortOrder ?? 999;
+  if (orderA !== orderB) return orderA - orderB;
+  return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+});
 ---
 <!DOCTYPE html>
 <html lang="ko">
@@ -15,52 +19,41 @@ const videoDesc = "일상의 피로를 덜어내고 심신을 안정시켜주는
   <title>JM 홈페이지</title>
   
   <style>
- /* [공통 기본 베이스 스타일] - 기기 기본 탑재 스마트폰/PC 전용 부드러운 고딕 매칭 */
+ /* [🎨 연보라 & 라벤더 감성 베이스 디자인] */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { 
-  font-family: "Apple SD Gothic Neo", "Malgun Gothic Semilight", "맑은 고딕", -apple-system, sans-serif;
+  font-family: "Apple SD Gothic Neo", "Malgun Gothic", -apple-system, sans-serif;
   background-color: #F8F6FA; 
   color: #332E3A; 
-  transition: background-color 0.3s ease; 
 }
 
-/* 🖼️ 배너 영역 (요청하신 대로 슬림하고 컴팩트한 높이 유지) */
+/* 배너 크기 슬림화 조정 */
 .banner-container { width: 100%; margin: 20px auto 0 auto; padding: 0 15px; }
-.main-banner { width: 100%; height: 110px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 20px rgba(163, 132, 219, 0.08); transition: height 0.3s ease; }
+.main-banner { width: 100%; height: 110px; border-radius: 16px; object-fit: cover; box-shadow: 0 4px 20px rgba(163, 132, 219, 0.08); }
 
-/* 📂 카테고리 메뉴 영역 */
+/* 카테고리 탭 디자인 */
 .category-section { margin: 25px auto 5px auto; padding: 0 15px; }
 .category-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
 .tab-btn { padding: 8px 16px; background: white; border: 1px solid #E4DFEB; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold; color: #6E6578; transition: all 0.25s ease; }
 .tab-btn:hover, .tab-btn.active { background: #A384DB; color: white; border-color: #A384DB; box-shadow: 0 4px 10px rgba(163, 132, 219, 0.2); }
 
-/* 메인 콘텐츠 본문 구역 */
+/* 본문 카드 그리드 */
 .main-content { padding: 15px; display: flex; flex-direction: column; gap: 15px; margin: 0 auto; }
-.card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(163, 132, 219, 0.04); border: 1px solid #F1EDF5; width: 100%; }
+.card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(163, 132, 219, 0.04); border: 1px solid #F1EDF5; width: 100%; transition: transform 0.2s; }
+.card:hover { transform: translateY(-3px); }
+.card-link { text-decoration: none; display: block; color: inherit; }
 
-/* 동글동글한 모서리 핏과 세련된 두께감 조합 */
-.card h2 { 
-  font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  font-size: 19px; 
-  font-weight: 800; 
-  margin-bottom: 12px; 
-  color: #4A3E56; 
-  letter-spacing: -0.3px;
-}
-.card p { font-size: 14px; color: #6E6578; line-height: 1.6; }
+.card h2 { font-size: 19px; font-weight: 800; margin-bottom: 8px; color: #4A3E56; letter-spacing: -0.3px; }
+.card p { font-size: 14px; color: #6E6578; line-height: 1.6; margin-bottom: 12px; }
+.post-date { font-size: 12px; color: #A384DB; font-weight: bold; }
 
-/* 📐 반응형 그리드 및 기기별 슬림 배너 최적화 비율 */
-@media (min-width: 640px) {
-  body { background-color: #F4EFF8; }
-  .main-banner { height: 140px; }
-  .tab-btn { padding: 9px 18px; font-size: 13.5px; }
-}
+/* 📐 반응형 그리드 핏 조율 */
+@media (min-width: 640px) { .main-banner { height: 140px; } }
 @media (min-width: 768px) {
   body { background-color: #EFE9F3; }
   .main-banner { height: 170px; }
-  .tab-btn { padding: 10px 22px; font-size: 14px; }
-  .main-content { flex-direction: row; justify-content: space-between; padding: 20px; gap: 20px; }
-  .card { width: 49%; }
+  .main-content { flex-direction: row; flex-wrap: wrap; padding: 20px; gap: 20px; }
+  .card { width: 48%; }
 }
 @media (min-width: 1280px) {
   body { background-color: #F8F6FA; }
@@ -68,29 +61,22 @@ body {
   .banner-container, .category-section, .main-content { max-width: 1200px; padding-left: 0; padding-right: 0; }
 }
 
-/* [💬 우측 하단 챗봇 스타일] */
-.chat-badge { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #A384DB; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 0 8px 25px rgba(163, 132, 219, 0.35); z-index: 1000; transition: transform 0.2s ease; }
-.chat-badge:hover { transform: scale(1.05); }
-.chat-box { position: fixed; bottom: 105px; right: 30px; width: 340px; height: 0; background: #F1EDF5; border-radius: 20px; box-shadow: 0 10px 35px rgba(163, 132, 219, 0.15); display: flex; flex-direction: column; overflow: hidden; z-index: 1000; border: 1px solid #E4DFEB; transition: height 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
+/* 💬 챗봇 디자인 */
+.chat-badge { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #A384DB; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 0 8px 25px rgba(163, 132, 219, 0.35); z-index: 1000; }
+.chat-box { position: fixed; bottom: 105px; right: 30px; width: 340px; height: 0; background: #F1EDF5; border-radius: 20px; box-shadow: 0 10px 35px rgba(163, 132, 219, 0.15); display: flex; flex-direction: column; overflow: hidden; z-index: 1000; border: 1px solid #E4DFEB; transition: height 0.3s ease; }
 .chat-box.open { height: 480px; }
-.chat-header { background: #9172C9; color: white; padding: 18px; font-weight: bold; font-size: 15px; letter-spacing: -0.5px; }
+.chat-header { background: #9172C9; color: white; padding: 18px; font-weight: bold; font-size: 15px; }
 .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background-color: #FDFBFF; }
-.chat-banner-notice { width: 100%; height: 44px; background: #4A3E56; color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; text-align: center; padding: 5px; }
-.msg-row { display: flex; flex-direction: column; max-width: 80%; }
-.msg-row.my-msg { align-self: flex-end; align-items: flex-end; }
-.msg-row.bot-msg { align-self: flex-start; align-items: flex-start; }
-.bubble { padding: 11px 15px; border-radius: 16px; font-size: 13.5px; line-height: 1.5; }
-.my-msg .bubble { background: #A384DB; color: white; border-top-right-radius: 2px; }
-.bot-msg .bubble { background: #F1EDF5; color: #332E3A; border-top-left-radius: 2px; border: 1px solid #E4DFEB; }
-.chat-input-area { display: flex; background: white; padding: 12px; border-top: 1px solid #F1EDF5; align-items: center; }
-.chat-input-area input { flex: 1; padding: 10px 16px; border: 1px solid #E4DFEB; border-radius: 20px; outline: none; font-size: 13px; background: #F8F6FA; color: #332E3A; }
-.chat-input-area button { margin-left: 8px; padding: 10px 18px; background: #A384DB; color: white; border: none; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: bold; }
+.chat-input-area { display: flex; background: white; padding: 12px; border-top: 1px solid #F1EDF5; }
+.chat-input-area input { flex: 1; padding: 10px 16px; border: 1px solid #E4DFEB; border-radius: 20px; outline: none; background: #F8F6FA; }
+.chat-input-area button { margin-left: 8px; padding: 10px 18px; background: #A384DB; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; }
   </style>
 </head>
 <body>
 
 <div class="banner-container">
-  <img src="https://unsplash.com" alt="메인 배너" class="main-banner">
+  <!-- 💡 바탕화면 public/images/banner.png 사진이 여기에 뜹니다 -->
+  <img src="/images/banner.png" alt="메인 배너" class="main-banner" onerror="this.src='https://unsplash.com'">
 </div>
 
 <div class="category-section">
@@ -101,68 +87,45 @@ body {
   </div>
 </div>
 
-<!-- 💡 안전하게 아스트로 자체 엔진이 초고속으로 찍어내는 카드 레이아웃 구조 -->
 <div class="main-content" id="content-area">
-  <div class="card" id="card-price">
-    <h2>{priceTitle}</h2>
-    <p>{priceDesc}</p>
-  </div>
-
-  <div class="card" id="card-location">
-    <h2>{videoTitle}</h2>
-    <p>{videoDesc}</p>
-  </div>
+  <!-- 💡 가짜 카드를 싹 지우고, 깃허브에 들어있는 진짜 글 데이터만 루프를 돌며 카드로 뽑아냅니다 -->
+  {sortedPosts.map((post) => (
+    <div class="card" data-category={post.data.tags ? post.data.tags[0] : 'all'}>
+      <a href={`/jm-astro-blog/blog/${post.slug}/`} class="card-link">
+        <h2>{post.data.title}</h2>
+        <p>{post.data.description}</p>
+        <span class="post-date">📅 {post.data.pubDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+      </a>
+    </div>
+  ))}
 </div>
 
 <div class="chat-badge" id="badge-btn">💬</div>
-
 <div class="chat-box" id="box-window">
   <div class="chat-header">💜 라벤더 상담소</div>
-  <div class="chat-banner-notice">📢 [이벤트] 첫 방문 상담 진행 시 마음 치유 엽서 증정</div>
   <div class="chat-messages" id="msg-container">
-    <div class="msg-row bot-msg">
-      <div class="bubble">안녕하세요! 궁금한 점이 있으시다면 언제든 편하게 질문을 입력해주세요. ✨</div>
-    </div>
+    <div class="bubble" style="background: #F1EDF5; padding: 11px 15px; border-radius: 16px; font-size: 13.5px;">안녕하세요! 궁금한 점이 있으시다면 편하게 질문해 주세요. ✨</div>
   </div>
-  <div class="chat-input-area">
-    <input type="text" placeholder="질문을 입력하세요...">
-    <button>전송</button>
-  </div>
+  <div class="chat-input-area"><input type="text" placeholder="질문을 입력하세요..."><button>전송</button></div>
 </div>
 
 <script is:inline>
-  // 💡 브라우저 과부하를 막는 초경량 카테고리 전환 스크립트
   const badgeBtn = document.getElementById('badge-btn');
   const boxWindow = document.getElementById('box-window');
-  const cardPrice = document.getElementById('card-price');
-  const cardLocation = document.getElementById('card-location');
-
   badgeBtn.addEventListener('click', () => { boxWindow.classList.toggle('open'); });
 
   function changeCategory(type, element) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     if (element) element.classList.add('active');
     
-    if (type === 'price') {
-      cardPrice.style.display = 'block';
-      cardPrice.style.width = '100%';
-      cardLocation.style.display = 'none';
-    } else if (type === 'location') {
-      cardPrice.style.display = 'none';
-      cardLocation.style.display = 'block';
-      cardLocation.style.width = '100%';
-    } else {
-      cardPrice.style.display = 'block';
-      cardLocation.style.display = 'block';
-      
-      if (window.innerWidth >= 768) {
-        cardPrice.style.width = '49%';
-        cardLocation.style.width = '49%';
+    document.querySelectorAll('.card').forEach(card => {
+      const cardCat = card.getAttribute('data-category');
+      if (type === 'all' || cardCat === type) {
+        card.style.display = 'block';
       } else {
-        cardPrice.style.width = '100%';
-        cardLocation.style.width = '100%';
+        card.style.display = 'none';
       }
-    }
+    });
   }
 </script>
 </body>
